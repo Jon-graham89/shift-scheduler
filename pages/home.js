@@ -5,25 +5,16 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import interactionPlugin from "@fullcalendar/interaction";
 import Button from "@mui/material/Button";
-import EventModal from "../components/EventModal";
+import ShiftUpdateModal from "../components/ShiftUpdateModal";
+import ViewEventModal from "../components/ViewEventModal";
 
 export default function Home(props) {
 	const [events, setEvents] = useState([
 		{
-			title: "event list item",
-			//date: "2021-10-29",
-
-			timeZone: "local",
-
-			start: "2021-11-02T19:00:00",
-			end: "2021-11-03T07:00:00",
-			display: "list-item",
-		},
-		{
 			title: "event description",
 			//date: "2021-10-29",
 			timeZone: "local",
-
+			id: 2,
 			start: "2021-10-29T06:00:00",
 			end: "2021-10-29T16:00:00",
 			backgroundColor: "red",
@@ -32,13 +23,26 @@ export default function Home(props) {
 			},
 			description: "Lecture",
 		},
+		{
+			title: "event list item",
+			//date: "2021-10-29",
+			id: 123456,
+			timeZone: "local",
+
+			start: "2021-11-02T19:00:00",
+			end: "2021-11-03T07:00:00",
+		},
 	]);
-	console.log(events);
+	const [currentShiftView, setCurrentShiftView] = useState(null);
 	const [isAdmin, setIsAdmin] = useState(true);
+	const [shiftSelect, setShiftSelect] = useState(null);
+
+	//Modal Open State
 	const [eventOpen, setEventOpen] = useState(false);
+	const [viewEventModalClose, setViewEventModalClose] = useState(false);
 
+	//New Shift State
 	const [newShiftTitle, setNewShiftTitle] = useState(null);
-
 	const [newShiftStart, setNewShiftStart] = useState(null);
 	const [newShiftEnd, setNewShiftEnd] = useState(null);
 
@@ -47,6 +51,12 @@ export default function Home(props) {
 	};
 	const handleClose = () => {
 		setEventOpen(false);
+	};
+	const handleEventModalOpen = () => {
+		setViewEventModalClose(true);
+	};
+	const handleEventModalClose = () => {
+		setViewEventModalClose(false);
 	};
 
 	let calendarRef = React.createRef();
@@ -65,10 +75,9 @@ export default function Home(props) {
 		setEvents([
 			...events,
 			{
+				id: Math.random(),
 				title: newShiftTitle,
-
 				timeZone: "local",
-
 				start: `${newShiftStart}`,
 				end: `${newShiftEnd}`,
 			},
@@ -78,13 +87,43 @@ export default function Home(props) {
 	};
 
 	const addEvent = () => {
-		const api = calendarRef.current.getApi();
+		const api = calendarRef;
 		console.log(api);
 		handleOpen();
 	};
-	const handleDateClick = (arg) => {
-		// bind with an arrow function
 
+	const formatShiftView = (selectedShift) => {
+		let startDay = selectedShift.start.split("T")[0].split("-");
+		let endDay = selectedShift.end.split("T")[0].split("-");
+		let startTime = selectedShift.start.split("T")[1];
+		let endTime = selectedShift.end.split("T")[1];
+
+		const startDayFinal =
+			new Date(startDay[0], startDay[1] - 1, startDay[2]).toDateString() +
+			" at " +
+			startTime;
+		const endDayFinal =
+			new Date(endDay[0], endDay[1] - 1, endDay[2]).toDateString() +
+			" at " +
+			endTime;
+
+		setCurrentShiftView({
+			title: selectedShift.title,
+			start: startDayFinal,
+			end: endDayFinal,
+		});
+	};
+
+	const handleShiftSelect = (arg) => {
+		handleEventModalOpen(true);
+		const selectedShift = events.filter(
+			(event) => event.id.toString() === arg.event._def.publicId.toString()
+		);
+		setShiftSelect(selectedShift[0]);
+		formatShiftView(selectedShift[0]);
+	};
+
+	const handleDateClick = (arg) => {
 		console.log(arg);
 	};
 
@@ -95,16 +134,25 @@ export default function Home(props) {
 				Add EVENT
 			</Button>
 			{eventOpen && (
-				<EventModal
+				<ShiftUpdateModal
 					handleClose={handleClose}
 					handleOpen={handleOpen}
 					open={eventOpen}
 					createNewShift={createNewShift}
-					setNewShiftTitle={setNewShiftTitle}
-					setNewShiftStart={setNewShiftStart}
-					setNewShiftEnd={setNewShiftEnd}
+					shiftTitleUpdate={setNewShiftTitle}
+					shiftStartTimeUpdate={setNewShiftStart}
+					shiftEndTimeUpdate={setNewShiftEnd}
+					title={"Create Shift"}
 				/>
 			)}
+			<ViewEventModal
+				currentShiftView={currentShiftView}
+				viewEventModalClose={viewEventModalClose}
+				handleViewEventModalClose={handleEventModalClose}
+				shiftSelect={shiftSelect}
+				shifts={events}
+				setShifts={setEvents}
+			/>
 			<FullCalendar
 				ref={calendarRef}
 				{...props}
@@ -119,8 +167,7 @@ export default function Home(props) {
 				editable={isAdmin}
 				dateClick={handleDateClick}
 				// nextDayThreshold={"10:00:00"}
-				//eventClick={handleDateClick}
-
+				eventClick={handleShiftSelect}
 				events={events}
 			/>
 		</>

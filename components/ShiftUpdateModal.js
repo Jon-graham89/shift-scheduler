@@ -4,7 +4,7 @@ import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import CalendarDateTimePicker from "./CalendarDateTimePicker";
+import DateTimePicker from "./DateTimePicker";
 
 const style = {
 	display: "flex",
@@ -22,19 +22,19 @@ const style = {
 	pb: 3,
 };
 
-export default function EventModal({
+export default function ShiftUpdateModal({
 	handleOpen,
 	handleClose,
 	open,
 	createNewShift,
-	setNewShiftTitle,
-
-	setNewShiftStart,
-	setNewShiftEnd,
+	shiftTitleUpdate,
+	shiftStartTimeUpdate,
+	shiftEndTimeUpdate,
+	title,
 }) {
 	return (
 		<div>
-			<Button onClick={handleOpen}>Open modal</Button>
+			{/* <Button onClick={handleOpen}>Open modal</Button> */}
 			<Modal
 				open={open}
 				onClose={handleClose}
@@ -49,16 +49,18 @@ export default function EventModal({
 						label="Title"
 						variant="standard"
 						color="secondary"
-						onChange={(e) => setNewShiftTitle(e.target.value)}
+						onChange={(e) => shiftTitleUpdate(e.target.value)}
 					/>
 					<TextField label="Description" variant="standard" color="secondary" />
 
-					<CalendarDateTimePicker
-						setNewShiftStart={setNewShiftStart}
-						setNewShiftEnd={setNewShiftEnd}
+					{/* Department selection, have shifts display different color based on department */}
+
+					<DateTimePicker
+						setNewShiftStart={shiftStartTimeUpdate}
+						setNewShiftEnd={shiftEndTimeUpdate}
 					/>
 					<Button color="primary" variant="outlined" onClick={createNewShift}>
-						Create Shift
+						{title}
 					</Button>
 				</Box>
 			</Modal>

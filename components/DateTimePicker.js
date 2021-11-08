@@ -2,10 +2,7 @@ import * as React from "react";
 import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
 
-export default function CalendarDateTimePicker({
-	setNewShiftStart,
-	setNewShiftEnd,
-}) {
+export default function DateTimePicker({ setNewShiftStart, setNewShiftEnd }) {
 	let today = new Date();
 	let date =
 		today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
