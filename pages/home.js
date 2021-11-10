@@ -1,40 +1,30 @@
 import React, { useState } from "react";
+import Link from "next/link";
+
+// Full Calendar
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import interactionPlugin from "@fullcalendar/interaction";
+
+// MUI
+import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
+
+// Components
 import ShiftUpdateModal from "../components/ShiftUpdateModal";
 import ViewEventModal from "../components/ViewEventModal";
+import FilterShifts from "../components/sidebar/FilterShifts";
+
+//Data
+import { event_data } from "../event_data";
 
 export default function Home(props) {
-	const [events, setEvents] = useState([
-		{
-			title: "event description",
-			//date: "2021-10-29",
-			timeZone: "local",
-			id: 2,
-			start: "2021-10-29T06:00:00",
-			end: "2021-10-29T16:00:00",
-			backgroundColor: "red",
-			extendedProps: {
-				department: "BioChemistry",
-			},
-			description: "Lecture",
-		},
-		{
-			title: "event list item",
-			//date: "2021-10-29",
-			id: 123456,
-			timeZone: "local",
-
-			start: "2021-11-02T19:00:00",
-			end: "2021-11-03T07:00:00",
-		},
-	]);
-	const [currentShiftView, setCurrentShiftView] = useState(null);
 	const [isAdmin, setIsAdmin] = useState(true);
+
+	const [shifts, setShifts] = useState(event_data);
+	const [currentShiftView, setCurrentShiftView] = useState(null);
 	const [shiftSelect, setShiftSelect] = useState(null);
 
 	//Modal Open State
@@ -45,6 +35,71 @@ export default function Home(props) {
 	const [newShiftTitle, setNewShiftTitle] = useState(null);
 	const [newShiftStart, setNewShiftStart] = useState(null);
 	const [newShiftEnd, setNewShiftEnd] = useState(null);
+
+	//Filter data state
+	const [department, setDepartment] = useState("");
+	const [employeeName, setEmployeeName] = useState("");
+
+	//FOR USE LATER *** NOT REQUIRED AT THE MOMENT 2021-11-10
+	const employees = [
+		{
+			first_name: "Kevin",
+			last_name: "Wert",
+			role: "Respirator Therapist",
+			isAdmin: false,
+			qualified_departments: [],
+		},
+		{
+			first_name: "Phil",
+			last_name: "Fortin",
+			role: "Respiratory Therapist",
+			isAdmin: false,
+			qualified_departments: [],
+		},
+		{
+			first_name: "Elise",
+			last_name: "Desjardins",
+			role: "Nure Practisioner",
+			isAdmin: false,
+			qualified_departments: [],
+		},
+		{
+			first_name: "Julie",
+			last_name: "Perron",
+			role: "Reception",
+			isAdmin: false,
+		},
+		{
+			first_name: "Marc-Andre",
+			last_name: "Godard",
+			role: "Doctor",
+			isAdmin: false,
+		},
+		{
+			first_name: "Shelley",
+			last_name: "Mason",
+			role: "Nurse Practisioner",
+			isAdmin: false,
+		},
+		{
+			first_name: "Gad",
+			last_name: "Saad",
+			role: "Doctor",
+			isAdmin: false,
+		},
+	];
+	class shift_constructor {
+		constructor(title, first, last, start, end, description, department) {
+			this.title = title;
+			this.employee = `${first} ${last}`;
+			timeZone = "local";
+			id = Math.random();
+			this.start = start;
+			this.end = end;
+			this.description = description;
+			this.department = department;
+		}
+	}
 
 	const handleOpen = () => {
 		setEventOpen(true);
@@ -72,8 +127,8 @@ export default function Home(props) {
 		if (!newShiftTitle || !newShiftStart || !newShiftEnd) {
 			return alert("missing information, please complete the form");
 		}
-		setEvents([
-			...events,
+		setShifts([
+			...shifts,
 			{
 				id: Math.random(),
 				title: newShiftTitle,
@@ -116,7 +171,7 @@ export default function Home(props) {
 
 	const handleShiftSelect = (arg) => {
 		handleEventModalOpen(true);
-		const selectedShift = events.filter(
+		const selectedShift = shifts.filter(
 			(event) => event.id.toString() === arg.event._def.publicId.toString()
 		);
 		setShiftSelect(selectedShift[0]);
@@ -129,10 +184,9 @@ export default function Home(props) {
 
 	return (
 		<>
-			<h1>HELLO WORLD THIS IS A CALENDAR</h1>
-			<Button variant="contained" color="secondary" onClick={addEvent}>
-				Add EVENT
-			</Button>
+			<Grid>
+				<h1>HELLO WORLD THIS IS A CALENDAR</h1>
+			</Grid>
 			{eventOpen && (
 				<ShiftUpdateModal
 					handleClose={handleClose}
@@ -150,26 +204,67 @@ export default function Home(props) {
 				viewEventModalClose={viewEventModalClose}
 				handleViewEventModalClose={handleEventModalClose}
 				shiftSelect={shiftSelect}
-				shifts={events}
-				setShifts={setEvents}
+				shifts={shifts}
+				setShifts={setShifts}
 			/>
-			<FullCalendar
-				ref={calendarRef}
-				{...props}
-				plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
-				initialView="dayGridMonth"
-				headerToolbar={{
-					left: "prev,next today",
-					center: "title",
-					right: "dayGridMonth,timeGridWeek,listWeek",
-				}}
-				nowIndicator={true}
-				editable={isAdmin}
-				dateClick={handleDateClick}
-				// nextDayThreshold={"10:00:00"}
-				eventClick={handleShiftSelect}
-				events={events}
-			/>
+			<Grid container>
+				<Grid item xs={2}>
+					<h1>working title</h1>
+
+					<Link href="/profile">
+						<a>
+							<h3>Profile</h3>
+						</a>
+					</Link>
+
+					<Link href="/arciles/first">
+						<a>
+							<h3>Articles</h3>
+						</a>
+					</Link>
+					<div>Curernt Shifts</div>
+					<Link href="/requested_shifts">
+						<a>
+							<h3>Requested Shifts</h3>
+						</a>
+					</Link>
+					<FilterShifts
+						employeeName={employeeName}
+						department={department}
+						setEmployeeName={setEmployeeName}
+						setDepartment={setDepartment}
+						setShifts={setShifts}
+					/>
+				</Grid>
+				<Grid item xs={10}>
+					<Button variant="contained" color="secondary" onClick={addEvent}>
+						Add EVENT
+					</Button>
+					<FullCalendar
+						ref={calendarRef}
+						{...props}
+						plugins={[
+							dayGridPlugin,
+							timeGridPlugin,
+							listPlugin,
+							interactionPlugin,
+						]}
+						initialView="dayGridMonth"
+						headerToolbar={{
+							left: "prev,next today",
+							center: "title",
+							right: "dayGridMonth,timeGridWeek,listWeek",
+						}}
+						displayEventEnd={true}
+						nowIndicator={true}
+						editable={isAdmin}
+						dateClick={handleDateClick}
+						// nextDayThreshold={"10:00:00"}
+						eventClick={handleShiftSelect}
+						events={shifts}
+					/>
+				</Grid>
+			</Grid>
 		</>
 	);
 }
